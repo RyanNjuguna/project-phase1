@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crash Game</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Crash Game</h1>
+        <p>Balance: $<span id="balance">100</span></p>
+
+        <div class="update-balance">
+            <input type="number" id="addBalanceAmount" placeholder="Enter amount to add" min="1">
+            <button id="addBalanceBtn">Add Funds</button>
+        </div>
+
+        <input type="number" id="betAmount" placeholder="Enter bet amount" min="1">
+        <button id="startBtn">Start Game</button>
+        <p id="multiplier">Multiplier: 1.00x</p>
+        <button id="cashOutBtn" disabled>Cash Out</button>
+        <p id="message"></p>
+    </div>
+<script src="main.js"></script>
+    
+</body>
+</html>
