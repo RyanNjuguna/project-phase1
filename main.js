@@ -1,4 +1,4 @@
-let balance = parseFloat(localStorage.getItem("balance")) || 100;
+let balance = 100;
 let bet = 0;
 let multiplier = 1.00;
 let gameRunning = false;
@@ -8,31 +8,38 @@ document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('cashOutBtn').addEventListener('click', cashOut);
 document.getElementById('addBalanceBtn').addEventListener('click', addBalance);
 
+// Show loading text initially
+document.getElementById('balance').textContent = "$Loading...";
+
+// Fetch balance from JSON server
 async function fetchBalance() {
     try {
         let response = await fetch("http://localhost:3000/balance");
         let data = await response.json();
-        balance = data || 100;
-        updateBalance();
+        balance = data || 100; // Default to 100 if no data found
     } catch (error) {
         console.error("Error fetching balance:", error);
+        balance = 100; // Default to 100 if fetch fails
     }
+    updateBalance();
 }
 
+// Update balance on UI and server
 async function updateBalance() {
-    document.getElementById('balance').textContent = balance.toFixed(2);
-    localStorage.setItem("balance", balance);
+    document.getElementById('balance').textContent = `${balance.toFixed(2)}`;
+
     try {
         await fetch("http://localhost:3000/balance", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(balance)
+            body: JSON.stringify({balance})
         });
     } catch (error) {
         console.error("Error updating balance:", error);
     }
 }
 
+// Start game logic
 function startGame() {
     bet = parseFloat(document.getElementById('betAmount').value);
     if (isNaN(bet) || bet <= 0 || bet > balance) {
@@ -58,6 +65,7 @@ function startGame() {
     }, 500);
 }
 
+// Cash out winnings
 async function cashOut() {
     if (!gameRunning) return;
 
@@ -69,12 +77,14 @@ async function cashOut() {
     stopGame();
 }
 
+// Handle game crash
 async function crashGame() {
     document.getElementById('message').textContent = `Crashed at ${multiplier.toFixed(2)}x! You lost $${bet.toFixed(2)}`;
     await saveBetHistory("loss", multiplier, bet);
     stopGame();
 }
 
+// Stop the game and reset UI
 function stopGame() {
     clearInterval(interval);
     gameRunning = false;
@@ -83,6 +93,7 @@ function stopGame() {
     updateBalance();
 }
 
+// Save bet history to JSON server
 async function saveBetHistory(result, multiplier, amount) {
     let betRecord = {
         result: result,
@@ -102,6 +113,7 @@ async function saveBetHistory(result, multiplier, amount) {
     }
 }
 
+// Add funds to balance
 async function addBalance() {
     let addAmount = parseFloat(document.getElementById('addBalanceAmount').value);
     if (isNaN(addAmount) || addAmount <= 0) {
@@ -114,5 +126,5 @@ async function addBalance() {
     document.getElementById('addBalanceAmount').value = "";
 }
 
-// Load balance when page loads
+// Fetch balance when the page loads
 fetchBalance();
